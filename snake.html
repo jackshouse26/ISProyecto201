@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #007bff;
+            margin-top: 20px;
+        }
+
+        
+        #gameCanvas {
+            display: block;
+            margin: 20px auto;
+            border: 5px solid #007bff;
+            background-color: #ffffff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        
+        .navigation {
+            margin-top: 20px;
+        }
+        .navigation a {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #007bff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .navigation a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Snake Game</h1>
+    <p>Use the arrow keys to move the snake. Eat the food to grow!</p>
+
+    
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    
+    <div class="navigation">
+        <a href="bjj.html">Back to BJJ Page</a>
+    </div>
+
+    <script>
+       
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        
+        const box = 20; 
+        let snake = [{ x: 10 * box, y: 10 * box }];
+        let direction = null;
+        let food = { 
+            x: Math.floor(Math.random() * 20) * box, 
+            y: Math.floor(Math.random() * 20) * box 
+        };
+        let score = 0;
+
+        
+        function drawSnake() {
+            for (let i = 0; i < snake.length; i++) {
+                ctx.fillStyle = i === 0 ? "#007bff" : "#00bcd4";
+                ctx.fillRect(snake[i].x, snake[i].y, box, box);
+                ctx.strokeStyle = "#ffffff";
+                ctx.strokeRect(snake[i].x, snake[i].y, box, box);
+            }
+        }
+
+        
+        function drawFood() {
+            ctx.fillStyle = "#ff0000";
+            ctx.fillRect(food.x, food.y, box, box);
+        }
+
+       
+        function update() {
+           
+            let headX = snake[0].x;
+            let headY = snake[0].y;
+
+            if (direction === "LEFT") headX -= box;
+            if (direction === "UP") headY -= box;
+            if (direction === "RIGHT") headX += box;
+            if (direction === "DOWN") headY += box;
+
+            
+            if (headX >= canvas.width) headX = 0;
+            if (headX < 0) headX = canvas.width - box;
+            if (headY >= canvas.height) headY = 0;
+            if (headY < 0) headY = canvas.height - box;
+
+            
+            if (headX === food.x && headY === food.y) {
+                score++;
+                food = {
+                    x: Math.floor(Math.random() * 20) * box,
+                    y: Math.floor(Math.random() * 20) * box
+                };
+            } else {
+                snake.pop(); 
+            }
+
+            
+            const newHead = { x: headX, y: headY };
+
+            
+            for (let segment of snake) {
+                if (segment.x === newHead.x && segment.y === newHead.y) {
+                    clearInterval(game); 
+                    alert("Game Over! Your score: " + score);
+                    return;
+                }
+            }
+
+            snake.unshift(newHead); 
+        }
+
+       
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            drawFood();
+            drawSnake();
+
+            
+            ctx.fillStyle = "#000000";
+            ctx.font = "18px Arial";
+            ctx.fillText("Score: " + score, box, box * 1.5);
+        }
+
+        
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowLeft" && direction !== "RIGHT") direction = "LEFT";
+            if (e.key === "ArrowUp" && direction !== "DOWN") direction = "UP";
+            if (e.key === "ArrowRight" && direction !== "LEFT") direction = "RIGHT";
+            if (e.key === "ArrowDown" && direction !== "UP") direction = "DOWN";
+        });
+
+        
+        function gameLoop() {
+            update();
+            draw();
+        }
+
+        const game = setInterval(gameLoop, 150); 
+    </script>
+</body>
+</html>
